@@ -102,17 +102,18 @@ impl<T: Debug> PosTree<T> {
                         else {return ptr;}
                     }
                     let prev = right_most(ptr);
+                    let pprev = (*prev).pt.unwrap();
                     (*prev).pt = (*ptr).pt;
                     (*prev).lt = Some(left);
                     (*prev).rt = Some(right);
-                    (*(*prev).pt.unwrap()).rt = None;
+                    (*pprev).rt = None;
                     (*left).pt = Some(prev);
                     (*right).pt = Some(prev);
                     if let Some(parent) = (*ptr).pt {
                         if (*parent).lt == Some(ptr) {(*parent).lt = Some(prev);}
                         else {(*parent).rt = Some(prev);}
                     }
-                    return 
+                    PosTree::rebalance(pprev);
                 }
                 else {
                     (*left).pt = (*ptr).pt;
@@ -121,6 +122,7 @@ impl<T: Debug> PosTree<T> {
                     if let Some(parent) = (*ptr).pt {
                         if (*parent).lt == Some(ptr) {(*parent).lt = Some(left);}
                         else {(*parent).rt = Some(left);}
+                        PosTree::rebalance(parent);
                     }
                 }
             }
@@ -129,6 +131,7 @@ impl<T: Debug> PosTree<T> {
                 if let Some(parent) = (*ptr).pt {
                     if (*parent).lt == Some(ptr) {(*parent).lt = Some(left);}
                     else {(*parent).rt = Some(left);}
+                    PosTree::rebalance(parent);
                 }
             }
         }
@@ -138,12 +141,14 @@ impl<T: Debug> PosTree<T> {
                 if let Some(parent) = (*ptr).pt {
                     if (*parent).lt == Some(ptr) {(*parent).lt = Some(right);}
                     else {(*parent).rt = Some(right);}
+                    PosTree::rebalance(parent);
                 }
             }
             else {
                 if let Some(parent) = (*ptr).pt {
                     if (*parent).lt == Some(ptr) {(*parent).lt = None;}
                     else {(*parent).rt = None;}
+                    PosTree::rebalance(parent);
                 }
                 if let Some(root) = (*ptr).ht {(*root).head = (*ptr).pt;}
             }
@@ -176,17 +181,15 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
     let mut t: PosTree<T> = PosTree::new();
     let mut h: HashMap<T, *mut Node<T>> = HashMap::new();
     for i in 0..v.len() {
-        // PosTree::print(t);
         if let Some(ptr) = h.get(&v[i]) {
             w.push(PosTree::position(*ptr));
-            // unsafe {PosTree::delete(*ptr);}
+            unsafe {PosTree::delete(*ptr);}
         }
         else {
             w.push(i + 1);
             z.push(v[i]);
         }
         h.insert(v[i], t.insert(v[i]));
-        // println!("{:?}", PosTree::position(*h.get(&v[0]).unwrap()));
     }
     PosTree::print(t);
 }
