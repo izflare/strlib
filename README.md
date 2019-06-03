@@ -1,0 +1,3 @@
+# strlib
+
+STR Library
