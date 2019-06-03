@@ -201,6 +201,16 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
 }
 
 
-pub fn restore() -> () {
-    {}
+pub fn restore<T: Copy + Debug>(v: &Vec<usize>, z: &Vec<T>, w: &mut Vec<T>) -> () {
+    let mut j = 0;
+    let mut s: Vec<T> = Vec::new();
+    for i in 0..v.len() {
+        if v[i] > j {w.push(z[j]); s.push(z[j]); j += 1;}
+        else {
+            let pos = s.len() - v[i];
+            w.push(s[pos]);
+            s.push(s[pos]);
+            s.remove(pos);
+        }
+    }
 }

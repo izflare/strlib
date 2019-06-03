@@ -10,4 +10,7 @@ fn main() {
     mtf::convert(&v, &mut w, &mut z);
     println!("w : {:?}", w);
     println!("z : {:?}", z);
+    let mut u: Vec<char> = Vec::new();
+    mtf::restore(&w, &z, &mut u);
+    println!("restored: {:?}", u);
 }
