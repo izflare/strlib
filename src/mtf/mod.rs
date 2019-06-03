@@ -38,6 +38,7 @@ impl<T: Debug> PosTree<T> {
     }
 
     pub unsafe fn rebalance(ptr: *mut Node<T>) -> () {
+        //{{{
         if let Some(left) = (*ptr).lt {
             (*ptr).ls = (*left).ls + (*left).rs + 1;
             (*ptr).lh = max((*left).lh, (*left).rh) + 1;
@@ -47,7 +48,6 @@ impl<T: Debug> PosTree<T> {
             (*ptr).rh = max((*right).lh, (*right).rh) + 1;
         }
         if (*ptr).lh > (*ptr).rh + 1 {
-            println!("left tall");
             let mut left = (*ptr).lt.unwrap();
             (*left).pt = (*ptr).pt;
             if let Some(parent) = (*ptr).pt {
@@ -68,11 +68,28 @@ impl<T: Debug> PosTree<T> {
         }
         else if (*ptr).lh + 1 < (*ptr).rh {
             println!("right tall");
-            // PosTree::rebalance(right);
+            let mut right = (*ptr).rt.unwrap();
+            (*right).pt = (*ptr).pt;
+            if let Some(parent) = (*ptr).pt {
+                if (*parent).rt.unwrap() == ptr {(*parent).rt = Some(right);}
+                else {(*parent).lt = Some(right);}
+            }
+            (*ptr).rt = (*right).lt;
+            (*ptr).rs = 0;
+            (*ptr).rh = 0;
+            if let Some(rightl) = (*right).lt {
+                (*rightl).pt = Some(ptr);
+                (*ptr).rs = (*rightl).ls + (*rightl).rs + 1;
+                (*ptr).rh = max((*rightl).ls, (*rightl).rs) + 1;
+            }
+            (*ptr).pt = Some(right);
+            (*right).lt = Some(ptr);
+            PosTree::rebalance(right);
         }
         else if let Some(parent) = (*ptr).pt {
             PosTree::rebalance(parent);
         }
+        //}}}
     }
 
     pub unsafe fn delete(ptr: *mut Node<T>) -> () {
@@ -146,7 +163,7 @@ impl<T: Debug> PosTree<T> {
         }
         unsafe fn print_node<T: Debug>(ptr: *mut Node<T>) -> () {
             if let Some(lt) = (*ptr).lt {print_node(lt);}
-            print!("v:{:?}, lh:{:?}, rh:{:?} | ", (*ptr).val, (*ptr).lh, (*ptr).rh);
+            print!("v:{:?}, lh:{}, rh:{}, ls: {}, rs: {} |\n ", (*ptr).val, (*ptr).lh, (*ptr).rh, (*ptr).ls, (*ptr).rs);
             if let Some(rt) = (*ptr).rt {print_node(rt);}
         }
         print!("[");
@@ -159,7 +176,7 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
     let mut t: PosTree<T> = PosTree::new();
     let mut h: HashMap<T, *mut Node<T>> = HashMap::new();
     for i in 0..v.len() {
-        PosTree::print(t);
+        // PosTree::print(t);
         if let Some(ptr) = h.get(&v[i]) {
             w.push(PosTree::position(*ptr));
             // unsafe {PosTree::delete(*ptr);}
