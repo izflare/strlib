@@ -5,3 +5,4 @@ authors = ["flare"]
 edition = "2018"
 
 [dependencies]
+bit-vec = "0.5.0"
