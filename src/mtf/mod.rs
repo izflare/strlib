@@ -70,7 +70,6 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
                 PosTree::rebalance(left);
             }
             else if (*ptr).lh + 1 < (*ptr).rh {
-                println!("right tall");
                 let mut right = (*ptr).rt.unwrap();
                 (*right).pt = (*ptr).pt;
                 if let Some(parent) = (*ptr).pt {
