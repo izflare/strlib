@@ -200,7 +200,7 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
     let mut t: PosTree<T> = PosTree::new();
     let mut h: HashMap<T, *mut Node<T>> = HashMap::new();
     for i in 0..v.len() {
-        PosTree::print(t);
+        // PosTree::print(t);
         if let Some(ptr) = h.get(&v[i]) {
             w.push(unsafe {PosTree::position(*ptr)});
             unsafe {PosTree::delete(*ptr);}
