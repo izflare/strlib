@@ -45,9 +45,17 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
                 (*ptr).ls = (*left).ls + (*left).rs + 1;
                 (*ptr).lh = max((*left).lh, (*left).rh) + 1;
             }
+            else {
+                (*ptr).ls = 0;
+                (*ptr).lh = 0;
+            }
             if let Some(right) = (*ptr).rt {
                 (*ptr).rs = (*right).rs + (*right).ls + 1;
                 (*ptr).rh = max((*right).lh, (*right).rh) + 1;
+            }
+            else {
+                (*ptr).rs = 0;
+                (*ptr).rh = 0;
             }
             if (*ptr).lh > (*ptr).rh + 1 {
                 let mut left = (*ptr).lt.unwrap();
@@ -104,7 +112,7 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
                             if let Some(rt) = (*ptr).rt {return right_most(rt);}
                             else {return ptr;}
                         }
-                        let prev = right_most(ptr);
+                        let prev = right_most(left);
                         let pprev = (*prev).pt.unwrap();
                         (*prev).pt = (*ptr).pt;
                         (*prev).lt = Some(left);
@@ -166,27 +174,28 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
             else {return PosTree::position((*ptr).pt.unwrap()) + (*ptr).ls + 1;}
         }
 
-        // pub fn print(t: PosTree<T>) -> () {
-        //     //{{{
-        //     unsafe fn find_root<T>(ptr: *mut Node<T>) -> *mut Node<T> {
-        //         return if let Some(pt) = (*ptr).pt {find_root(pt)} else {ptr}
-        //     }
-        //     unsafe fn print_node<T: Debug>(ptr: *mut Node<T>) -> () {
-        //         if let Some(lt) = (*ptr).lt {print_node(lt);}
-        //         print!("v:{:?}, lh:{}, rh:{}, ls: {}, rs: {}, lp: {:?} |\n ", 
-        //                (*ptr).val, (*ptr).lh, (*ptr).rh, (*ptr).ls, (*ptr).rs, (*ptr).lp);
-        //         if let Some(rt) = (*ptr).rt {print_node(rt);}
-        //     }
-        //     print!("[");
-        //     if let Some(head) = t.head {unsafe {print_node(find_root(head));}}
-        //     println!("]");
-        //     //}}}
-        // }
+        pub fn print(t: PosTree<T>) -> () {
+            //{{{
+            unsafe fn find_root<T>(ptr: *mut Node<T>) -> *mut Node<T> {
+                return if let Some(pt) = (*ptr).pt {find_root(pt)} else {ptr}
+            }
+            unsafe fn print_node<T: Debug>(ptr: *mut Node<T>) -> () {
+                if let Some(lt) = (*ptr).lt {print_node(lt);}
+                print!("v:{:?}, lh:{}, rh:{}, ls: {}, rs: {}, lp: {:?} |\n ", 
+                       (*ptr).val, (*ptr).lh, (*ptr).rh, (*ptr).ls, (*ptr).rs, (*ptr).lp);
+                if let Some(rt) = (*ptr).rt {print_node(rt);}
+            }
+            print!("[");
+            if let Some(head) = t.head {unsafe {print_node(find_root(head));}}
+            println!("]");
+            //}}}
+        }
     }
 
     let mut t: PosTree<T> = PosTree::new();
     let mut h: HashMap<T, *mut Node<T>> = HashMap::new();
     for i in 0..v.len() {
+        PosTree::print(t);
         if let Some(ptr) = h.get(&v[i]) {
             w.push(unsafe {PosTree::position(*ptr)});
             unsafe {PosTree::delete(*ptr);}
@@ -197,6 +206,7 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
         }
         h.insert(v[i], t.insert(v[i]));
     }
+    PosTree::print(t);
 }
 
 
