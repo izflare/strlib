@@ -171,7 +171,10 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
 
         pub unsafe fn position(ptr: *mut Node<T>) -> usize {
             if (*ptr).lp {return (*ptr).ls + 1;}
-            else {return PosTree::position((*ptr).pt.unwrap()) + (*ptr).ls + 1;}
+            else {
+                let parent = (*ptr).pt.unwrap();
+                return PosTree::position(parent) + if (*parent).lt == Some(ptr) {(*ptr).ls - 1} else {(*ptr).ls +  1};
+            }
         }
 
         pub fn print(t: PosTree<T>) -> () {
