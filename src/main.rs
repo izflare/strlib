@@ -10,6 +10,7 @@ fn main() {
     let mut w: Vec<usize> = Vec::new();
     let mut z: Vec<u32> = Vec::new();
     mtf::convert(&v, &mut w, &mut z);
+    println!("v: {:?}", v);
     println!("z: {:?}", z);
     println!("w: {:?}", w);
 }

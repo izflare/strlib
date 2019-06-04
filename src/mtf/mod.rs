@@ -177,28 +177,27 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
             }
         }
 
-        pub fn print(t: PosTree<T>) -> () {
-            //{{{
-            unsafe fn find_root<T>(ptr: *mut Node<T>) -> *mut Node<T> {
-                return if let Some(pt) = (*ptr).pt {find_root(pt)} else {ptr}
-            }
-            unsafe fn print_node<T: Debug>(ptr: *mut Node<T>) -> () {
-                if let Some(lt) = (*ptr).lt {print_node(lt);}
-                print!("v:{:?}, lh:{}, rh:{}, ls: {}, rs: {}, lp: {:?} |\n ", 
-                       (*ptr).val, (*ptr).lh, (*ptr).rh, (*ptr).ls, (*ptr).rs, (*ptr).lp);
-                if let Some(rt) = (*ptr).rt {print_node(rt);}
-            }
-            print!("[");
-            if let Some(head) = t.head {unsafe {print_node(find_root(head));}}
-            println!("]");
-            //}}}
-        }
+        // pub fn print(t: PosTree<T>) -> () {
+        //     //{{{
+        //     unsafe fn find_root<T>(ptr: *mut Node<T>) -> *mut Node<T> {
+        //         return if let Some(pt) = (*ptr).pt {find_root(pt)} else {ptr}
+        //     }
+        //     unsafe fn print_node<T: Debug>(ptr: *mut Node<T>) -> () {
+        //         if let Some(lt) = (*ptr).lt {print_node(lt);}
+        //         print!("v:{:?}, lh:{}, rh:{}, ls: {}, rs: {}, lp: {:?} |\n ", 
+        //                (*ptr).val, (*ptr).lh, (*ptr).rh, (*ptr).ls, (*ptr).rs, (*ptr).lp);
+        //         if let Some(rt) = (*ptr).rt {print_node(rt);}
+        //     }
+        //     print!("[");
+        //     if let Some(head) = t.head {unsafe {print_node(find_root(head));}}
+        //     println!("]");
+        //     //}}}
+        // }
     }
 
     let mut t: PosTree<T> = PosTree::new();
     let mut h: HashMap<T, *mut Node<T>> = HashMap::new();
     for i in 0..v.len() {
-        PosTree::print(t);
         if let Some(ptr) = h.get(&v[i]) {
             w.push(unsafe {PosTree::position(*ptr)});
             unsafe {PosTree::delete(*ptr);}
@@ -209,7 +208,6 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
         }
         h.insert(v[i], t.insert(v[i]));
     }
-    PosTree::print(t);
 }
 
 
