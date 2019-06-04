@@ -59,43 +59,108 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
             }
             if (*ptr).lh > (*ptr).rh + 1 {
                 let mut left = (*ptr).lt.unwrap();
-                (*left).pt = (*ptr).pt;
-                if let Some(parent) = (*ptr).pt {
-                    if (*parent).lt.unwrap() == ptr {(*parent).lt = Some(left);}
-                    else {(*parent).rt = Some(left);}
+                if (*left).lh < (*left).rh {
+                    let mut leftr = (*left).rt.unwrap();
+                    (*leftr).pt = (*ptr).pt;
+                    if let Some(parent) = (*ptr).pt {
+                        if (*parent).lt.unwrap() == ptr {(*parent).lt = Some(leftr);}
+                        else {(*parent).rt = Some(leftr);}
+                    }
+                    (*ptr).lt = (*leftr).rt;
+                    (*ptr).ls = 0;
+                    (*ptr).lh = 0;
+                    if let Some(leftrr) = (*leftr).rt {
+                        (*leftrr).pt = Some(ptr);
+                        (*ptr).ls = (*leftrr).ls + (*leftrr).rs + 1;
+                        (*ptr).lh = max((*leftrr).ls, (*leftrr).rs) + 1;
+                    }
+                    (*left).rt = (*leftr).lt;
+                    (*left).rs = 0;
+                    (*left).rh = 0;
+                    if let Some(leftrl) = (*leftr).lt {
+                        (*leftrl).pt = Some(left);
+                        (*left).rs = (*leftrl).ls + (*leftrl).rs + 1;
+                        (*left).rh = max((*leftrl).ls, (*leftrl).rs) + 1;
+                    }
+                    (*ptr).pt = Some(leftr);
+                    (*left).pt = Some(leftr);
+                    (*leftr).rt = Some(ptr);
+                    (*leftr).lt = Some(left);
+                    if (*ptr).lp {(*leftr).lp = true;}
+                    (*ptr).lp = false;
+                    PosTree::rebalance(leftr);
                 }
-                (*ptr).lt = (*left).rt;
-                (*ptr).ls = 0;
-                (*ptr).lh = 0;
-                if let Some(leftr) = (*left).rt {
-                    (*leftr).pt = Some(ptr);
-                    (*ptr).ls = (*leftr).ls + (*leftr).rs + 1;
-                    (*ptr).lh = max((*leftr).ls, (*leftr).rs) + 1;
+                else {
+                    (*left).pt = (*ptr).pt;
+                    if let Some(parent) = (*ptr).pt {
+                        if (*parent).lt.unwrap() == ptr {(*parent).lt = Some(left);}
+                        else {(*parent).rt = Some(left);}
+                    }
+                    (*ptr).lt = (*left).rt;
+                    (*ptr).ls = 0;
+                    (*ptr).lh = 0;
+                    if let Some(leftr) = (*left).rt {
+                        (*leftr).pt = Some(ptr);
+                        (*ptr).ls = (*leftr).ls + (*leftr).rs + 1;
+                        (*ptr).lh = max((*leftr).ls, (*leftr).rs) + 1;
+                    }
+                    (*ptr).pt = Some(left);
+                    (*left).rt = Some(ptr);
+                    (*ptr).lp = false;
+                    PosTree::rebalance(ptr);
                 }
-                (*ptr).pt = Some(left);
-                (*left).rt = Some(ptr);
-                (*ptr).lp = false;
-                PosTree::rebalance(ptr);
             }
             else if (*ptr).lh + 1 < (*ptr).rh {
                 let mut right = (*ptr).rt.unwrap();
-                (*right).pt = (*ptr).pt;
-                if let Some(parent) = (*ptr).pt {
-                    if (*parent).rt.unwrap() == ptr {(*parent).rt = Some(right);}
-                    else {(*parent).lt = Some(right);}
+                if (*right).lh > (*right).rh {
+                    let mut rightl = (*right).lt.unwrap();
+                    (*rightl).pt = (*ptr).pt;
+                    if let Some(parent) = (*ptr).pt {
+                        if (*parent).lt.unwrap() == ptr {(*parent).lt = Some(rightl);}
+                        else {(*parent).rt = Some(rightl);}
+                    }
+                    (*ptr).rt = (*rightl).lt;
+                    (*ptr).rs = 0;
+                    (*ptr).rh = 0;
+                    if let Some(rightll) = (*rightl).lt {
+                        (*rightll).pt = Some(ptr);
+                        (*ptr).rs = (*rightll).ls + (*rightll).rs + 1;
+                        (*ptr).rh = max((*rightll).ls, (*rightll).rs) + 1;
+                    }
+                    (*right).lt = (*rightl).rt;
+                    (*right).ls = 0;
+                    (*right).lh = 0;
+                    if let Some(rightlr) = (*rightl).rt {
+                        (*rightlr).pt = Some(right);
+                        (*right).ls = (*rightlr).ls + (*rightlr).rs + 1;
+                        (*right).lh = max((*rightlr).ls, (*rightlr).rs) + 1;
+                    }
+                    (*ptr).pt = Some(rightl);
+                    (*right).pt = Some(rightl);
+                    (*rightl).lt = Some(ptr);
+                    (*rightl).rt = Some(right);
+                    if (*ptr).lp {(*rightl).lp = true;}
+                    PosTree::rebalance(rightl);
                 }
-                (*ptr).rt = (*right).lt;
-                (*ptr).rs = 0;
-                (*ptr).rh = 0;
-                if let Some(rightl) = (*right).lt {
-                    (*rightl).pt = Some(ptr);
-                    (*ptr).rs = (*rightl).ls + (*rightl).rs + 1;
-                    (*ptr).rh = max((*rightl).ls, (*rightl).rs) + 1;
+                else {
+                    (*right).pt = (*ptr).pt;
+                    if let Some(parent) = (*ptr).pt {
+                        if (*parent).rt.unwrap() == ptr {(*parent).rt = Some(right);}
+                        else {(*parent).lt = Some(right);}
+                    }
+                    (*ptr).rt = (*right).lt;
+                    (*ptr).rs = 0;
+                    (*ptr).rh = 0;
+                    if let Some(rightl) = (*right).lt {
+                        (*rightl).pt = Some(ptr);
+                        (*ptr).rs = (*rightl).ls + (*rightl).rs + 1;
+                        (*ptr).rh = max((*rightl).ls, (*rightl).rs) + 1;
+                    }
+                    (*ptr).pt = Some(right);
+                    (*right).lt = Some(ptr);
+                    if (*ptr).lp {(*right).lp = true;}
+                    PosTree::rebalance(ptr);
                 }
-                (*ptr).pt = Some(right);
-                (*right).lt = Some(ptr);
-                if (*ptr).lp {(*right).lp = true;}
-                PosTree::rebalance(ptr);
             }
             else if let Some(parent) = (*ptr).pt {
                 PosTree::rebalance(parent);
@@ -184,8 +249,8 @@ pub fn convert<T: Eq + Copy + Clone + Hash + Debug>(v: &Vec<T>, w: &mut Vec<usiz
         //     }
         //     unsafe fn print_node<T: Debug>(ptr: *mut Node<T>) -> () {
         //         if let Some(lt) = (*ptr).lt {print_node(lt);}
-        //         print!("v:{:?}, lh:{}, rh:{}, ls: {}, rs: {}, lp: {:?} |\n ", 
-        //                (*ptr).val, (*ptr).lh, (*ptr).rh, (*ptr).ls, (*ptr).rs, (*ptr).lp);
+        //         print!("v:{:?}, lh:{}, ls:{}, rh: {}, rs: {}, lp: {:?} |\n ", 
+        //                (*ptr).val, (*ptr).lh, (*ptr).ls, (*ptr).rh, (*ptr).rs, (*ptr).lp);
         //         if let Some(rt) = (*ptr).rt {print_node(rt);}
         //     }
         //     print!("[");
