@@ -2,7 +2,7 @@ extern crate bit_vec;
 
 use bit_vec::BitVec;
 
-pub fn to_bits(x: u32, length: u32, bv: &mut BitVec) -> () {
+pub fn to_bv(x: u32, length: u32, bv: &mut BitVec) -> () {
     let mut z = x;
     z = z.rotate_right(length);
     for _ in 0..length {
@@ -15,9 +15,9 @@ pub fn encode(v: &Vec<u32>, bv: &mut BitVec) -> () {
     let mut m: u32 = 0;
     for e in v {if *e > m {m = *e;}}
     let r = 32 - m.leading_zeros();
-    to_bits(r, 5, bv);
+    to_bv(r, 5, bv);
     for e in v {
-        to_bits(*e, r, bv);
+        to_bv(*e, r, bv);
     }
 }
 
