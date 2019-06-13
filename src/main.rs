@@ -1,19 +1,18 @@
 extern crate strlib;
-extern crate bit_vec;
+// extern crate bit_vec;
 
-// use strlib::delta;
-// use strlib::gamma;
-use strlib::ffenc;
-use bit_vec::BitVec;
-// use strlib::mtf;
+use strlib::rlenc;
+// use bit_vec::BitVec;
 
 fn main() {
-    let v: Vec<u32> = vec![1, 2, 3, 4, 5, 6, 7, 8, 2, 4, 9, 7, 10, 8, 11, 7, 3, 12, 4, 11, 1, 13, 14];
-    let mut bv: BitVec = BitVec::new();
-    ffenc::encode(&v, &mut bv);
+    let v: Vec<u32> = vec![1,1,1,1,2,2,2,3,3,1,1,3,3,3,3,3,3,2,2,2,2,1];
+    let mut s: Vec<u32> = Vec::new();
+    let mut l: Vec<u32> = Vec::new();
+    rlenc::encode(&v, &mut s, &mut l);
     let mut u: Vec<u32> = Vec::new();
-    ffenc::decode(&bv, &mut u);
+    rlenc::decode(&s, &l, &mut u);
     println!("v: {:?}",v);
-    println!("bv: {:?}", bv);
+    println!("s: {:?}", s);
+    println!("l: {:?}", l);
     println!("u: {:?}", u);
 }
