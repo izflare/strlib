@@ -13,11 +13,12 @@ pub fn encode(v: &Vec<u32>, bv: &mut BitVec) -> () {
         }
     }
 
-   for e in v {
+    for e in v {
+        assert!(*e > 0, "zero is found");
         let r = (*e).leading_zeros();
         for _ in 0..(32 - r as usize -1) {bv.push(false);}
         u_to_bv(*e, 32 - r, bv);
-   }
+    }
 }
 
 pub fn decode(bv: &BitVec, v: &mut Vec<u32>) -> () {
