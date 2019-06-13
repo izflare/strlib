@@ -16,14 +16,14 @@ pub fn encode(v: &Vec<u32>, width: u32, bv: &mut BitVec) -> () {
         if i % width as usize == 0 {bbs.push(bitlength)}
         else {
             if let Some(last) = bbs.last_mut() {
-                if bitlength > *last {*last += 1;}
+                if bitlength > *last {*last = bitlength;}
             }
         }
     }
 
     let mut last = 0;
     for bs in &bbs {
-        delta.push(if *bs > last {*bs - last} else {last - *bs});
+        delta.push(if *bs > last {*bs - last} else {last - *bs + 1});
         pms.push(*bs > last);
         last = *bs;
     }
@@ -105,9 +105,10 @@ pub fn decode(bv: &BitVec, v: &mut Vec<u32>) -> () {
     gamma::decode(&r1_s_bv, &mut r1_s);
     runlength::decode(&r1_s, &r1_l, &mut delta);
 
+
     let mut last = 0;
     for (d, b) in delta.iter().zip(pms.iter()) {
-        bbs.push(if b {last + *d} else {last - *d});
+        bbs.push(if b {last + *d} else {last - *d + 1});
         last = *bbs.last().unwrap();
     }
 
