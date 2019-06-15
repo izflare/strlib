@@ -12,7 +12,7 @@ pub fn encode(v: &Vec<u32>, blocksize: u32, bv: &mut BitVec) -> () {
     let mut pms: BitVec = BitVec::new();
 
     for i in 0..v.len() {
-        let bitlength = 32 - v[i].leading_zeros();
+        let bitlength = std::cmp::max(32 - v[i].leading_zeros(), 1);
         if i % blocksize as usize == 0 {bbs.push(bitlength)}
         else {
             if let Some(last) = bbs.last_mut() {
