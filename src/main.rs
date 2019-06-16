@@ -1,7 +1,7 @@
 extern crate strlib;
 extern crate bit_vec;
 
-use strlib::block_fixed;
+use strlib::fixed;
 use bit_vec::BitVec;
 
 fn main() {
@@ -10,11 +10,11 @@ fn main() {
     println!("v: {:?}",v);
 
     let mut bv: BitVec = BitVec::new();
-    block_fixed::encode(&v, 6, &mut bv);
+    fixed::encode(&v, &mut bv);
     println!("bv: {:?}", bv);
 
     let mut u: Vec<u32> = Vec::new();
-    block_fixed::decode(&bv, &mut u);
+    fixed::decode(&bv, &mut u);
     println!("u: {:?}", u);
 
     assert_eq!(v, u);
