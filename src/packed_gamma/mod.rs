@@ -2,8 +2,8 @@ extern crate bit_vec;
 
 use bit_vec::BitVec;
 use super::gamma;
-use super::fixed;
-use super::runlength;
+use super::fble;
+use super::run_length;
 
 pub fn encode(v: &Vec<u32>, blocksize: u32, bv: &mut BitVec) -> () {
 
@@ -30,24 +30,24 @@ pub fn encode(v: &Vec<u32>, blocksize: u32, bv: &mut BitVec) -> () {
 
     let mut r1_h: Vec<u32> = Vec::new();
     let mut r1_l: Vec<u32> = Vec::new();
-    runlength::encode(&delta, &mut r1_h, &mut r1_l);
+    run_length::encode(&delta, &mut r1_h, &mut r1_l);
     let mut r1_h_bv = BitVec::new();
     gamma::encode(&r1_h, &mut r1_h_bv);
 
     let mut r2_h: Vec<u32> = Vec::new();
     let mut r2_l: Vec<u32> = Vec::new();
-    runlength::encode(&r1_l, &mut r2_h, &mut r2_l);
+    run_length::encode(&r1_l, &mut r2_h, &mut r2_l);
     let mut r2_h_bv = BitVec::new();
     let mut r2_l_bv = BitVec::new();
     gamma::encode(&r2_h, &mut r2_h_bv);
     gamma::encode(&r2_l, &mut r2_l_bv);
 
     // write to bv
-    fixed::to_bv(blocksize, 32, bv);
-    fixed::to_bv(pms.len() as u32, 32, bv);
-    fixed::to_bv(r1_h_bv.len() as u32, 32, bv);
-    fixed::to_bv(r2_h_bv.len() as u32, 32, bv);
-    fixed::to_bv(r2_l_bv.len() as u32, 32, bv);
+    fble::to_bv(blocksize, 32, bv);
+    fble::to_bv(pms.len() as u32, 32, bv);
+    fble::to_bv(r1_h_bv.len() as u32, 32, bv);
+    fble::to_bv(r2_h_bv.len() as u32, 32, bv);
+    fble::to_bv(r2_l_bv.len() as u32, 32, bv);
 
     for b in &pms {bv.push(b);}
     for b in &r1_h_bv {bv.push(b);}
@@ -55,7 +55,7 @@ pub fn encode(v: &Vec<u32>, blocksize: u32, bv: &mut BitVec) -> () {
     for b in &r2_l_bv {bv.push(b);}
     let mut r = 0;
     for i in 0..v.len() {
-        fixed::to_bv(v[i], bbs[r], bv);
+        fble::to_bv(v[i], bbs[r], bv);
         if i as u32 % blocksize == blocksize - 1 {r += 1;}
     }
 
@@ -100,10 +100,10 @@ pub fn decode(bv: &BitVec, v: &mut Vec<u32>) -> () {
 
     gamma::decode(&r2_l_bv, &mut r2_l);
     gamma::decode(&r2_h_bv, &mut r2_h);
-    runlength::decode(&r2_h, &r2_l, &mut r1_l);
+    run_length::decode(&r2_h, &r2_l, &mut r1_l);
 
     gamma::decode(&r1_h_bv, &mut r1_h);
-    runlength::decode(&r1_h, &r1_l, &mut delta);
+    run_length::decode(&r1_h, &r1_l, &mut delta);
 
 
     let mut last = 0;

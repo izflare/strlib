@@ -1,6 +1,7 @@
 pub mod delta;
 pub mod gamma;
 pub mod mtf;
-pub mod fixed;
-pub mod runlength;
-pub mod block_fixed;
+pub mod fble;
+pub mod run_length;
+pub mod packed_gamma;
+pub mod huffman_coding;
